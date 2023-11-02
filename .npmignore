@@ -1,0 +1,6 @@
+/src
+**/tsconfig.json
+**/.npmignore
+**/.gitignore
+**/.idea
+.prettierrc.js
