@@ -341,6 +341,7 @@ const NuvoDialog = function (layerProps: LayerProps) {
         console.log('[sdk] ContractTransfer', err, res);
     };
 
+
     const getInjectableJSMessage = function (message: any) {
         return `
           (function() {
@@ -350,6 +351,12 @@ const NuvoDialog = function (layerProps: LayerProps) {
           })();
         `;
     }
+    const sdkClientError = function (err: any) {
+        console.log('[sdk] error', err);
+    }
+    const sdkClientDebugLog= function (res: any) {
+        console.log('[sdk] debug', res );
+    }
     const initPolisClient = function () {
         console.log("initPolisClient:", layerProps)
         var opts = {
@@ -358,10 +365,10 @@ const NuvoDialog = function (layerProps: LayerProps) {
             apiHost: layerProps.data.apiHost,
             oauthHost: layerProps.data.oauthHost,
             debug: false,
-            openLink(link: any, data: any) {
+            openLink(link: any, data: any,walletType:string) {
                 console.log('[sdk]', link, data);
-                console.log('[sdk]', layerProps.data.oauthHost + '/#/oauth2/bridge', data);
-                setOpenUrl(layerProps.data.oauthHost + '/#/oauth2/bridge');
+                // console.log('[sdk]', layerProps.data.oauthHost + '/#/oauth2/bridge', data);
+                setOpenUrl(link);
                 listenUrlRef.current = DeviceEventEmitter.addListener(
                     'SDK_URL_LOADED',
                     () => {
@@ -397,11 +404,23 @@ const NuvoDialog = function (layerProps: LayerProps) {
 
         console.log("client opts:", opts);
 
-        polisClientRef.current = new PolisClient(opts);
+        var client = new PolisClient(opts);
+        client.on('error', sdkClientError);
+        // client.on('debug', sdkClientDebugLog);
+        // client.on('tx-confirm-dialog', (data:any) => {
+        //     console.log('[sdk] tx-confirm-dialog',data);
+        // })
+        // client.on('tx-confirm', (data:any) => {
+        //     console.log('[sdk] connected',data);
+        // })
+        polisClientRef.current =client;
         // console.log('get polisClient', polisClientRef.current)
     };
+    const checkIsNotTransfer = function () {
+        return layerProps.action !== NuvoSdkAction.transfer && layerProps.action !== NuvoSdkAction.contract_transfer;
+    }
     const handleOnMessage = function (data: any) {
-        if (layerProps.action !== NuvoSdkAction.transfer) {
+        if (!checkIsNotTransfer()) {
             return;
         }
         if (data.type === 'openLink' && Platform.OS === 'android') {
@@ -424,21 +443,23 @@ const NuvoDialog = function (layerProps: LayerProps) {
             break;
     }
     const handleLoadEnd = function (syntheticEvent: any) {
-        webRef.current.clearCache(true);
-        if (layerProps.action !== NuvoSdkAction.transfer) {
+        console.log('[web] load end ',layerProps.action);
+        if (checkIsNotTransfer()) {
             return;
         }
         // to post
         // this to post data
-        console.log('[event] web loaded');
+
         const {nativeEvent} = syntheticEvent;
         if (nativeEvent.url) {
             DeviceEventEmitter.emit('SDK_URL_LOADED');
         }
-
+        console.log('[web] load end emit ',nativeEvent.url);
+        // webRef.current.clearCache(true);
     };
 
     const handleError = function () {
+        console.log('[web] load error');
         setWebLoadError(true)
     }
 

@@ -47,6 +47,32 @@ function App(): JSX.Element {
 }
 ```
 
+## RNNuvoSDK
+### login
+```js
+Login(loginParams: LoginParams):Promise<any>;
+```
+### get token
+```js
+getAccessToken();
+```
+
+### Get user information
+```js
+getUserInfo();
+```
+
+### transfer
+```js
+transfer(tx:TransParams):Promise<any>;
+```
+
+### contract transfer
+```js
+contractTransfer(tx:ContractTransParams):Promise<any>;
+
+```
+
 ## Use Example
 
 

@@ -10,7 +10,9 @@ interface TransParams {
     to:string,
     value:string,
     data:string,
-    chainId:number
+    chainId:number,
+    debug?: boolean;
+
 }
 
 interface ContractTransParams {
@@ -18,7 +20,8 @@ interface ContractTransParams {
     method:string;
     ABI:string;
     args:any[];
-    chainId:number
+    chainId:number,
+    debug?: boolean;
 }
 
 interface LoginParams {

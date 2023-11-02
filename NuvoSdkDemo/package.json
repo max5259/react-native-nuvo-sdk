@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android --deviceId 192.168.0.105:5555",
+    "android": "react-native run-android --deviceId 192.168.0.100:5555",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
@@ -13,7 +13,7 @@
   "dependencies": {
     "react-native-webview": "12.1.0",
     "@react-native-async-storage/async-storage": "^1.19.3",
-    "@nuvosphere.io/react-native-nuvo-sdk": "1.0.0-beta.3",
+    "@nuvosphere.io/react-native-nuvo-sdk": "1.0.0-beta.4",
     "assert": "1.1.1",
     "process": "0.11.0",
     "react": "18.2.0",

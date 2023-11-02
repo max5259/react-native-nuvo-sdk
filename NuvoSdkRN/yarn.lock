@@ -2099,10 +2099,10 @@
     semver "^7.3.8"
     superstruct "^1.0.3"
 
-"@metis.io/middleware-client@1.1.36-beta.1":
-  version "1.1.36-beta.1"
-  resolved "https://registry.yarnpkg.com/@metis.io/middleware-client/-/middleware-client-1.1.36-beta.1.tgz#037370bbd882d7ecdb8bbcec94f299603a40fb51"
-  integrity sha512-zmSjx1FkXkAkYkgunIho79xh/zhzq4qX83RWYVTvt1QOyfa9QwFBsXCyqEeD83Nsl86A/QVQhx5IdGE5VNwRlA==
+"@metis.io/middleware-client@1.1.36-beta.2":
+  version "1.1.36-beta.2"
+  resolved "https://registry.yarnpkg.com/@metis.io/middleware-client/-/middleware-client-1.1.36-beta.2.tgz#208829b4b9cd649b36951f06e833826f765e12e5"
+  integrity sha512-Mni8aaMIV04+sJcQTDqm4aOdwjcN7fKsj7z2sStxYNugsG8Fu6nBTdWWlVXYLitVr1mB9/btkl7xv2QMfMpjqw==
   dependencies:
     "@ethersproject/abstract-provider" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"
