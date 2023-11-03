@@ -17,5 +17,5 @@ export const CHAIN_ID = 599
 export const SCHEME_URL = 'http://localhost:8000'
 export const APP_ID = '60ed992bb520d95b454c4e88'
 // export const APP_ID = '611cc74139481700e8885bc5'
-export const APP_KEY = '12648a2f929b4c04800c02e750325163'
+export const APP_KEY = 'xxxxxxxxxxxxxxx'
 // export const APP_KEY = '40133e2b4a0e4dadbb4a867e2494c152'
