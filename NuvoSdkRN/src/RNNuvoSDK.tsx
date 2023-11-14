@@ -366,8 +366,14 @@ const NuvoDialog = function (layerProps: LayerProps) {
             oauthHost: layerProps.data.oauthHost,
             debug: false,
             openLink(link: any, data: any,walletType:string) {
-                console.log('[sdk]', link, data);
                 // console.log('[sdk]', layerProps.data.oauthHost + '/#/oauth2/bridge', data);
+                const urlObj = new URL(link);
+                console.log("urlObj:",urlObj.searchParams);
+                const searchParams = urlObj.searchParams;
+                // 如果参数已存在，则更新它；否则，添加新参数
+                searchParams.append("client", "reactapp");
+                link = urlObj.toString();
+                console.log('[sdk]', link, data);
                 setOpenUrl(link);
                 listenUrlRef.current = DeviceEventEmitter.addListener(
                     'SDK_URL_LOADED',
@@ -479,6 +485,7 @@ const NuvoDialog = function (layerProps: LayerProps) {
                     style={{width: Dimensions.get('screen').width * 0.9, flex: 1}}
                     ref={webRef}
                     key={new Date().getTime()}
+
                     javaScriptCanOpenWindowsAutomatically={true}
                     onLoadStart={handleWebLoadStart}
                     onLoadEnd={handleLoadEnd}
