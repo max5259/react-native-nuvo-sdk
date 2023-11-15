@@ -11,7 +11,7 @@ import MyStorage from './utils/myStorage';
 
 import {getDappInfo, httpUserInfo} from './api/dapp';
 import {ModalLayerController, ModalLayerFactory, ModalLayers} from "react-native-modal-layer";
-import {ContractTransParams, LayerProps, LoginParams, NuvoSdkAction, TransParams} from "./types";
+import {ContractTransParams, LayerProps, LoginParams, NuvoSdkAction, Params, TransParams} from "./types";
 import {handlerPromise, parseUrlParam} from "./utils";
 import {getTokenFromCode} from "./api/auth";
 import {PolisClient} from "@metis.io/middleware-client";
@@ -93,9 +93,9 @@ export default class RNNuvoSDK extends React.Component {
                 data: params,
                 onCompleted: function (res: any) {
                     // console.log("login completed:", res);
-                    if(res.error){
+                    if (res.error) {
                         reject(res.error)
-                    }else{
+                    } else {
                         resolve(res.info)
                     }
                     refThis.layer?.hide();
@@ -122,13 +122,34 @@ export default class RNNuvoSDK extends React.Component {
             this.layer?.show({
                 action: NuvoSdkAction.contract_transfer, onCompleted: function (res: any) {
                     // console.log("contractTransfer completed:", res);
-                    if(res.error){
+                    if (res.error) {
                         reject(res.error)
-                    }else{
+                    } else {
                         resolve(res.info)
                     }
                     refThis.layer?.hide();
                 }, data: tx
+            });
+        });
+    }
+
+    getBalance(params: Params) {
+        const refThis = this;
+        refThis.layer?.hide();
+        return new Promise((resolve, reject) => {
+            const refThis = this;
+            this.layer?.show({
+                action: NuvoSdkAction.balanceOf, onCompleted: function (res: any) {
+                    // console.log("contractTransfer completed:", res);
+                    if (res.error) {
+                        reject(res.error)
+                    } else {
+                            const value = res.info.toString()
+                            console.log("value:",value);
+                            resolve(value);
+                    }
+
+                }, data: params
             });
         });
     }
@@ -144,9 +165,9 @@ export default class RNNuvoSDK extends React.Component {
             this.layer?.show({
                 action: NuvoSdkAction.transfer, onCompleted: function (res: any) {
                     console.log("transfer completed:", res);
-                    if(res.error){
+                    if (res.error) {
                         reject(res.error)
-                    }else{
+                    } else {
                         resolve(res.info)
                     }
                     refThis.layer?.hide();
@@ -177,7 +198,7 @@ const NuvoDialog = function (layerProps: LayerProps) {
     const listenUrlRef = useRef(null);
     const [token, setToken] = useState('');
     const [webLoadError, setWebLoadError] = useState(false);
-
+    const [blankUrl, setBlankUrl] = useState('about:blank');
     const APP_ID = layerProps.data.appId;
     const apiHost = layerProps.data.apiHost;
     const oauthHost = layerProps.data.oauthHost;
@@ -243,10 +264,7 @@ const NuvoDialog = function (layerProps: LayerProps) {
                 });
                 // must to storage asscessToken
                 MyStorage._sava(MyStorage.keyMap.TOKEN, res.data.accessToken);
-                console.log(
-                    '[storage] token',
-                    await MyStorage._load(MyStorage.keyMap.TOKEN),
-                );
+
                 return res.data.accessToken;
             }
             layerProps.onCompleted &&
@@ -256,18 +274,20 @@ const NuvoDialog = function (layerProps: LayerProps) {
                 error: 'unkown err'
             });
             return null;
+            setOpenUrl(blankUrl);
         }
         return null;
+
     };
     const handleOpenWebView = async function (data: LoginParams) {
-        let url: any = await getAuthUrl(data,true);
+        let url: any = await getAuthUrl(data, true);
         console.log("set open url:", url)
         // if(!hadLoading){
         // hadLoading = true;
         setOpenUrl(url);
         // }
     };
-    const getAuthUrl = async function (loginParams:LoginParams, onlyLink = false) {
+    const getAuthUrl = async function (loginParams: LoginParams, onlyLink = false) {
         const switchAccount = loginParams.switchAccount;
         const appId = APP_ID;
         const authUrl = `${oauthHost}/#/oauth2-login?return_url=${encodeURIComponent(
@@ -297,51 +317,6 @@ const NuvoDialog = function (layerProps: LayerProps) {
     const handleReload = function () {
         webRef?.current.reload();
     };
-    const handleTransfer = async function (tx: TransParams) {
-        initPolisClient();
-        const polisClient: any = polisClientRef.current;
-        await polisClient.connect(await MyStorage._load(MyStorage.keyMap.TOKEN));
-        const value = '0x' + BigInt(tx.value).toString(16);
-        console.log("transfer tx:",tx,value);
-
-        let [err, res] = await handlerPromise( polisClient.web3Provider.getSigner().sendTransaction({
-            "from":tx.from,
-            "to":tx.to,
-            "value":value,
-            "data":tx.data
-        }))
-
-        layerProps.onCompleted &&
-        layerProps.onCompleted({
-            action: NuvoSdkAction.transfer,
-            info: res,
-            error:err,
-        });
-        console.log('[sdk] handleTransfer', err, res);
-    };
-    const handleContractTransfer = async function (tx: ContractTransParams) {
-        initPolisClient();
-        const polisClient: any = polisClientRef.current;
-        await polisClient.connect(await MyStorage._load(MyStorage.keyMap.TOKEN));
-        //test erc20
-        let daiAddress = tx.contractAddress;
-        // let daiAbi = ['function transfer(address to,uint256 amount)'];
-        let daiAbi = [tx.ABI];
-        let daiContract2 = polisClient.getContract(daiAddress, daiAbi);
-        //
-        let [err, res] = await handlerPromise(
-            daiContract2[tx.method](...tx.args)
-        );
-        layerProps.onCompleted &&
-        layerProps.onCompleted({
-            action: NuvoSdkAction.contract_transfer,
-            info: res,
-            error:err
-        });
-        console.log('[sdk] ContractTransfer', err, res);
-    };
-
-
     const getInjectableJSMessage = function (message: any) {
         return `
           (function() {
@@ -354,8 +329,45 @@ const NuvoDialog = function (layerProps: LayerProps) {
     const sdkClientError = function (err: any) {
         console.log('[sdk] error', err);
     }
-    const sdkClientDebugLog= function (res: any) {
-        console.log('[sdk] debug', res );
+    const sdkClientDebugLog = function (res: any) {
+        console.log('[sdk] debug', res);
+    }
+
+    const checkIsNotTransfer = function () {
+        return layerProps.action !== NuvoSdkAction.transfer && layerProps.action !== NuvoSdkAction.contract_transfer;
+    }
+    const handleOnMessage = function (data: any) {
+        if (!checkIsNotTransfer()) {
+            return;
+        }
+        if (data.type === 'openLink' && Platform.OS === 'android') {
+            Linking.openURL('MetaMask://');
+        }
+        // is old message of result
+        if ((data.data && data.status) || data.message) {
+            DeviceEventEmitter.emit('SDK_RESULT', data);
+        }
+    };
+
+    const handleLoadEnd = function (syntheticEvent: any) {
+        console.log('[web] load end ', layerProps.action);
+        if (checkIsNotTransfer()) {
+            return;
+        }
+        // to post
+        // this to post data
+
+        const {nativeEvent} = syntheticEvent;
+        if (nativeEvent.url) {
+            DeviceEventEmitter.emit('SDK_URL_LOADED');
+        }
+        console.log('[web] load end emit ', nativeEvent.url);
+        // webRef.current.clearCache(true);
+    };
+
+    const handleError = function () {
+        console.log('[web] load error');
+        setWebLoadError(true)
     }
     const initPolisClient = function () {
         console.log("initPolisClient:", layerProps)
@@ -365,12 +377,12 @@ const NuvoDialog = function (layerProps: LayerProps) {
             apiHost: layerProps.data.apiHost,
             oauthHost: layerProps.data.oauthHost,
             debug: false,
-            openLink(link: any, data: any,walletType:string) {
+            openLink(link: any, data: any, walletType: string) {
                 // console.log('[sdk]', layerProps.data.oauthHost + '/#/oauth2/bridge', data);
                 const urlObj = new URL(link);
-                console.log("urlObj:",urlObj.searchParams);
+                // console.log("urlObj:", urlObj.searchParams);
                 const searchParams = urlObj.searchParams;
-                // 如果参数已存在，则更新它；否则，添加新参数
+                //
                 searchParams.append("client", "reactapp");
                 link = urlObj.toString();
                 console.log('[sdk]', link, data);
@@ -407,7 +419,6 @@ const NuvoDialog = function (layerProps: LayerProps) {
                 });
             },
         };
-
         console.log("client opts:", opts);
 
         var client = new PolisClient(opts);
@@ -419,24 +430,69 @@ const NuvoDialog = function (layerProps: LayerProps) {
         // client.on('tx-confirm', (data:any) => {
         //     console.log('[sdk] connected',data);
         // })
-        polisClientRef.current =client;
+        polisClientRef.current = client;
         // console.log('get polisClient', polisClientRef.current)
     };
-    const checkIsNotTransfer = function () {
-        return layerProps.action !== NuvoSdkAction.transfer && layerProps.action !== NuvoSdkAction.contract_transfer;
-    }
-    const handleOnMessage = function (data: any) {
-        if (!checkIsNotTransfer()) {
-            return;
-        }
-        if (data.type === 'openLink' && Platform.OS === 'android') {
-            Linking.openURL('MetaMask://');
-        }
-        // is old message of result
-        if ((data.data && data.status) || data.message) {
-            DeviceEventEmitter.emit('SDK_RESULT', data);
-        }
+
+    const handleTransfer = async function (tx: TransParams) {
+        initPolisClient();
+        const polisClient: any = polisClientRef.current;
+        await polisClient.connect(await MyStorage._load(MyStorage.keyMap.TOKEN));
+        const value = '0x' + BigInt(tx.value).toString(16);
+        console.log("transfer tx:", tx, value);
+
+        let [err, res] = await handlerPromise(polisClient.web3Provider.getSigner().sendTransaction({
+            "from": tx.from,
+            "to": tx.to,
+            "value": value,
+            "data": tx.data
+        }))
+
+        layerProps.onCompleted &&
+        layerProps.onCompleted({
+            action: NuvoSdkAction.transfer,
+            info: res,
+            error: err,
+        });
+        console.log('[sdk] handleTransfer', err, res);
+        // setOpenUrl(blankUrl);
     };
+
+    const handleContractTransfer = async function (tx: ContractTransParams) {
+        initPolisClient();
+        const polisClient: any = polisClientRef.current;
+        await polisClient.connect(await MyStorage._load(MyStorage.keyMap.TOKEN));
+        //test erc20
+        let daiAddress = tx.contractAddress;
+        // let daiAbi = ['function transfer(address to,uint256 amount)'];
+        let daiAbi = [tx.ABI];
+        let daiContract2 = polisClient.getContract(daiAddress, daiAbi);
+        //
+        let [err, res] = await handlerPromise(
+            daiContract2[tx.method](...tx.args)
+        );
+        layerProps.onCompleted &&
+        layerProps.onCompleted({
+            action: NuvoSdkAction.contract_transfer,
+            info: res,
+            error: err
+        });
+        console.log('[sdk] ContractTransfer', err, res);
+    };
+    const getBalance = async function (params: Params) {
+        initPolisClient();
+        const polisClient: any = polisClientRef.current;
+        let [err, res] = await handlerPromise(
+            polisClient.web3Provider.getBalance(params.address)
+        )
+        layerProps.onCompleted &&
+        layerProps.onCompleted({
+            action: NuvoSdkAction.balanceOf,
+            info: res,
+            error: err
+        });
+    }
+
     switch (layerProps.action) {
         case NuvoSdkAction.login:
             handleOpenWebView(layerProps.data);
@@ -447,28 +503,10 @@ const NuvoDialog = function (layerProps: LayerProps) {
         case NuvoSdkAction.contract_transfer:
             handleContractTransfer(layerProps.data);
             break;
+        case NuvoSdkAction.balanceOf:
+            getBalance(layerProps.data);
+            break;
     }
-    const handleLoadEnd = function (syntheticEvent: any) {
-        console.log('[web] load end ',layerProps.action);
-        if (checkIsNotTransfer()) {
-            return;
-        }
-        // to post
-        // this to post data
-
-        const {nativeEvent} = syntheticEvent;
-        if (nativeEvent.url) {
-            DeviceEventEmitter.emit('SDK_URL_LOADED');
-        }
-        console.log('[web] load end emit ',nativeEvent.url);
-        // webRef.current.clearCache(true);
-    };
-
-    const handleError = function () {
-        console.log('[web] load error');
-        setWebLoadError(true)
-    }
-
     useEffect(() => {
         MyStorage._getStorage();
     }, []);
@@ -485,7 +523,9 @@ const NuvoDialog = function (layerProps: LayerProps) {
                     style={{width: Dimensions.get('screen').width * 0.9, flex: 1}}
                     ref={webRef}
                     key={new Date().getTime()}
-
+                    cacheEnabled={false}
+                    startInLoadingState={true}
+                    androidCacheMode="LOAD_NO_CACHE"
                     javaScriptCanOpenWindowsAutomatically={true}
                     onLoadStart={handleWebLoadStart}
                     onLoadEnd={handleLoadEnd}

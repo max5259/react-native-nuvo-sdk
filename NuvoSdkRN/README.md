@@ -73,12 +73,27 @@ contractTransfer(tx:ContractTransParams):Promise<any>;
 
 ```
 
+### getBalance(params:Params)
+```js
+getBalance({address:"",chainId:599})
+```
 ## Use Example
 
 
 ### For Android
 
 ```bash
+function getBalance(){
+        rnNuvoSdkRef.current.getBalance({"address":"0xf1181bd15E8780B69a121A8D8946cC1C23972Bd4",chainId:599})
+            .then((res: any) => {
+                console.log("balance success:", res); // 1000000000000000000
+                setBalance(res);
+            })
+            .catch((err: any) => {
+                console.log("exec err:", err)
+                setInfo(JSON.stringify(err));
+            });
+    }
   function handleToLogin() {
         rnNuvoSdkRef.current.Login({
             appId: APP_ID,

@@ -2169,10 +2169,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nuvosphere.io/react-native-nuvo-sdk@1.0.0-beta.3":
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@nuvosphere.io/react-native-nuvo-sdk/-/react-native-nuvo-sdk-1.0.0-beta.3.tgz#39252013878bc871aa7ab86101552a012f38d8d5"
-  integrity sha512-+spA5zzR5St4BF24cmDS7XAUhKSs4i3/LuD+NTC5H3UbvJO5EqL519O7morDB3ksEsmVcVFT2mWg4/sctJPteg==
+"@nuvosphere.io/react-native-nuvo-sdk@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@nuvosphere.io/react-native-nuvo-sdk/-/react-native-nuvo-sdk-1.0.1.tgz#db62d32e44f251e58587df3d0025e13ec04410a2"
+  integrity sha512-3C7qoKddHeX5kjhTgr5nx5b/AQ8w94NF5oOLhHca+rdQ/Q7yZDDzzHyM/sajQLfFuiTu9SLODj/r65JSGTJ4ow==
   dependencies:
     "@metamask/sdk" "^0.3.0"
     "@metis.io/middleware-client" "1.1.36-beta.1"

@@ -16,5 +16,6 @@ declare class NuvoSdkRN extends React.Component {
     transfer(tx:TransParams):Promise<any>;
     contractTransfer(tx:ContractTransParams):Promise<any>;
     getAccessToken();
+    getBalance(address:string):Promise<any>;
 }
 export default NuvoSdkRN;

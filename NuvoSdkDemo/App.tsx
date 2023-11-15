@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {JSX,useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Button,
     StyleSheet,
@@ -28,6 +28,7 @@ function App(): JSX.Element {
 
     const [token, setToken] = useState('');
     const [info, setInfo] = useState('');
+    const [balance, setBalance] = useState('');
     const [userInfo, setUserInfo] = useState('');
 
     const backgroundStyle = {
@@ -94,8 +95,20 @@ function App(): JSX.Element {
             "chainId": 599
         }).then((res: any) => {
             console.log("handleToContractTransfer success:", res);
-            setInfo(JSON.stringify(res));
+            setInfo((res));
         })
+            .catch((err: any) => {
+                console.log("exec err:", err)
+                setInfo(JSON.stringify(err));
+            });
+    }
+
+    function getBalance(){
+        rnNuvoSdkRef.current.getBalance({"address":"0xf1181bd15E8780B69a121A8D8946cC1C23972Bd4",chainId:599})
+            .then((res: any) => {
+                console.log("balance success:", res);
+                setBalance(res);
+            })
             .catch((err: any) => {
                 console.log("exec err:", err)
                 setInfo(JSON.stringify(err));
@@ -125,6 +138,11 @@ function App(): JSX.Element {
                     )}
                     <Button title="Get User Info" onPress={() => getUserInfo()}/>
                     <Text>user info:{userInfo}</Text>
+                    <Button
+                        onPress={() => getBalance()}
+                        title=" getBalance"
+                    />
+                    <Text>result: {balance}</Text>
                     <RNNuvoSDK
                         ref={rnNuvoSdkRef}
                         appId={APP_ID}

@@ -11,9 +11,8 @@
     "postinstall": "rn-nodeify --install buffer,crypto,stream,util,process,vm,assert,bn --hack --yarn"
   },
   "dependencies": {
-    "react-native-webview": "12.1.0",
+    "@nuvosphere.io/react-native-nuvo-sdk": "^1.0.1",
     "@react-native-async-storage/async-storage": "^1.19.3",
-    "@nuvosphere.io/react-native-nuvo-sdk": "1.0.0-beta.4",
     "assert": "1.1.1",
     "process": "0.11.0",
     "react": "18.2.0",
@@ -21,6 +20,7 @@
     "react-native-crypto": "2.1.0",
     "react-native-modal-layer": "^1.0.8",
     "react-native-randombytes": "^3.6.1",
+    "react-native-webview": "12.1.0",
     "readable-stream": "1.0.33",
     "stream-browserify": "1.0.0",
     "util": "~0.10.3",

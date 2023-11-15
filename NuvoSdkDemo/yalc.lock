@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "@nuvosphere.io/react-native-nuvo-sdk": {
-      "signature": "84280682d8251b5e3ee22b02d3519d7e"
+      "signature": "1a30e63693027cc1f119bec0cc96f478"
     }
   }
 }

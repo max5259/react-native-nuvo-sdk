@@ -3,6 +3,7 @@ const NuvoSdkAction = {
     login: 'login',
     transfer: 'transfer',
     contract_transfer: 'contract_transfer',
+    balanceOf: 'balanceOf'
 };
 
 interface TransParams {
@@ -13,6 +14,11 @@ interface TransParams {
     chainId:number,
     debug?: boolean;
 
+}
+
+interface Params {
+    chainId:number,
+    address:string
 }
 
 interface ContractTransParams {
@@ -46,5 +52,5 @@ interface LayerProps {
 
 
 export { NuvoSdkAction }
-export type { TransParams,ContractTransParams, LoginParams, SdkProps, LayerProps };
+export type { TransParams,ContractTransParams,Params, LoginParams, SdkProps, LayerProps };
 
